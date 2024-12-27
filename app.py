@@ -41,8 +41,4 @@ def image_recognition():
         return jsonify(success_response(data=result))
         
     except Exception as e:
-        return jsonify(error_response(message=str(e))), 500
-
-if __name__ == '__main__':
-    # 启动服务器，开启调试模式
-    app.run(debug=True) 
+        return jsonify(error_response(message=str(e))), 500 
