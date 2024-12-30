@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, request
-from zhipu_service import analyze_image
+from flask import Flask, jsonify, request, Response, stream_with_context
+from zhipu_service import analyze_image, chat_with_ai
 from utils import success_response, error_response
 
 # 创建 Flask 应用实例
@@ -38,6 +38,26 @@ def image_recognition():
         result = analyze_image(image_url)
         
         # 返回识别结果
+        return jsonify(success_response(data=result))
+        
+    except Exception as e:
+        return jsonify(error_response(message=str(e))), 500 
+
+# 智谱AI聊天API
+@app.route('/api/chat', methods=['POST'])
+def chat():
+    try:
+        # 获取请求数据
+        request_data = request.get_json()
+        messages = request_data.get('messages')
+        
+        if not messages:
+            return jsonify(error_response(message="未提供对话内容")), 400
+
+        # 调用智谱AI服务
+        result = chat_with_ai(messages)
+        
+        # 返回结果
         return jsonify(success_response(data=result))
         
     except Exception as e:
