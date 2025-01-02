@@ -27,15 +27,16 @@ def get_data():
 @app.route('/api/image-recognition', methods=['POST'])
 def image_recognition():
     try:
-        # 获取POST请求中的图片URL
+        # 获取POST请求中的图片URL和问题
         request_data = request.get_json()
         image_url = request_data.get('image_url')
+        question = request_data.get('question', '图里有什么')  # 如果没有提供问题，使用默认值
         
         if not image_url:
             return jsonify(error_response(message="未提供图片URL")), 400
 
         # 调用智谱AI服务
-        result = analyze_image(image_url)
+        result = analyze_image(image_url, question)
         
         # 返回识别结果
         return jsonify(success_response(data=result))

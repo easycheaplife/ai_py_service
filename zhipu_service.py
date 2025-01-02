@@ -1,9 +1,12 @@
 from zhipuai import ZhipuAI
 import config
 
-def analyze_image(image_url):
+def analyze_image(image_url, question="图里有什么"):
     """
     调用智谱AI接口分析图片
+    Args:
+        image_url: 图片URL
+        question: 要问的问题，默认为"图里有什么"
     """
     client = ZhipuAI(api_key=config.ZHIPUAI_API_KEY)
     
@@ -15,7 +18,7 @@ def analyze_image(image_url):
                 "content": [
                     {
                         "type": "text",
-                        "text": "图里有什么"
+                        "text": question
                     },
                     {
                         "type": "image_url",
