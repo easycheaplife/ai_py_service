@@ -3,26 +3,17 @@ import time
 from functools import wraps
 from flask import request, g
 import json
+from logging.handlers import TimedRotatingFileHandler
+import os
+from datetime import datetime
 
-def success_response(data=None, message="success"):
-    """
-    成功响应格式
-    """
-    return {
-        "code": 0,
-        "data": data or {},
-        "message": message
-    }
+# 创建日志目录
+log_dir = 'logs'
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
-def error_response(message="error", code=1):
-    """
-    错误响应格式
-    """
-    return {
-        "code": code,
-        "data": {},
-        "message": message
-    }
+# 获取当前日期
+current_date = datetime.now().strftime('%Y-%m-%d')
 
 # 配置日志
 logging.basicConfig(
@@ -31,8 +22,29 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-file_handler = logging.FileHandler('app.log')
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+# 创建 TimedRotatingFileHandler
+file_handler = TimedRotatingFileHandler(
+    filename=os.path.join(log_dir, f'app.{current_date}.log'),  # 包含日期的文件名
+    when='midnight',  # 每天午夜切割
+    interval=1,       # 每1天切割一次
+    backupCount=30,   # 保留30天的日志
+    encoding='utf-8'
+)
+
+# 设置日志格式
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# 自定义文件名后缀
+def namer(default_name):
+    """自定义日志文件名"""
+    # 从默认文件名中提取日期
+    date = default_name.split('.')[-2]
+    return f"app.{date}.log"
+
+file_handler.namer = namer
+
+# 添加处理器
 logger.addHandler(file_handler)
 
 def log_request():

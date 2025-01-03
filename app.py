@@ -1,9 +1,19 @@
 from flask import Flask, jsonify, request, Response, stream_with_context
 from zhipu_service import analyze_image, chat_with_ai
-from utils import success_response, error_response
+from utils import success_response, error_response, log_request, log_response
 
 # 创建 Flask 应用实例
 app = Flask(__name__)
+
+# 注册请求前钩子
+@app.before_request
+def before_request():
+    log_request()
+
+# 注册响应后钩子
+@app.after_request
+def after_request(response):
+    return log_response(response)
 
 # 根路由
 @app.route('/')
